@@ -13,7 +13,7 @@ class index:
             time = data.timestamp
             nonce = data.nonce
             echo = data.echostr
-            token = ""
+            token = "helloworld"
             list = [token,time,nonce]
             list.sort()
             sha1 = hashlib.sha1()
