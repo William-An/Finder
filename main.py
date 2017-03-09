@@ -14,13 +14,15 @@ class index:
             time = data.timestamp
             nonce = data.nonce
             echo = data.echostr
-            token = "helloworld"
+            token = u"helloworld"
             list = [token,time,nonce]
             list.sort()
             sha1 = hashlib.sha1()
+            print(list)
             map(sha1.update,list)
             hashcode = sha1.hexdigest()
-            print("index/GET Func:", hashcode," ", sign)
+            print("index/GET Func:", hashcode, sign)
+            print("Token",token )
             if hashcode == sign:
                 return echo
             else:
