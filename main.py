@@ -1,9 +1,10 @@
+#coding=utf-8
 import web
 import hashlib
 urls = (
-    '/','index'
+    '/wx','wechat'
 )
-class index:
+class wechat:
     def GET(selfself):
         try:
             data = web.input()
@@ -13,11 +14,14 @@ class index:
             time = data.timestamp
             nonce = data.nonce
             echo = data.echostr
-            token = ""
+            token = "helloworld"
             list = [token,time,nonce]
+            print(list)
             list.sort()
             sha1 = hashlib.sha1()
-            map(sha1.update,list)
+            print(list)
+            for i in list:
+                sha1.update(i.encode()) # 3.5
             hashcode = sha1.hexdigest()
             print("index/GET Func:", hashcode," ", sign)
             if hashcode == sign:
