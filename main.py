@@ -14,12 +14,13 @@ class index:
             time = data.timestamp
             nonce = data.nonce
             echo = data.echostr
-            token = u"helloworld"
+            token = "helloworld"
             list = [token,time,nonce]
             list.sort()
             sha1 = hashlib.sha1()
             print(list)
-            map(sha1.update,list)
+            for i in list: # 3.5 & 2.7
+                sha1.update(i.encode())
             hashcode = sha1.hexdigest()
             print("index/GET Func:", hashcode, sign)
             print("Token",token )
