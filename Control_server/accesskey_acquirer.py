@@ -38,7 +38,7 @@ class token_acquirer:
         """
         # Initialize database
         # Class attribute?
-        self.db = web.database(dbn="sqlite",db=PATH+r"\..\Static\appid.db")
+        token_acquirer.db = web.database(dbn="sqlite",db=PATH+r"\..\Static\appid.db")
         self.last_time = 0
         msg = time.strftime("%Y-%m-%d %H:%M:%S")+"\tProcessing request..."
         print(msg)
@@ -55,12 +55,12 @@ class token_acquirer:
         # SELECT expire_time FROM appid_token WHERE appid =
         try:
             # Using db.query to process regular sql code
-            self.last_time = self.db.query("SELECT last_time FROM appid_token WHERE appid = $appid",vars= {"appid":credential["appid"]})["last_time"]
+            self.last_time = token_acquirer.db.query("SELECT last_time FROM appid_token WHERE appid = $appid",vars= {"appid":credential["appid"]})["last_time"]
             # print(self.last_time)
         except: # New appid?
             # INSERT INTO appid_token VALUES(appid, current_token, last_time)
-            self.db.query("INSERT INTO appid_token VALUES($appid,$current_token,$last_time)",vars={"appid":credential["appid"],"current_token":"", "last_time":self.last_time})
-            # print(self.db.select('appid_token')[0])
+            token_acquirer.db.query("INSERT INTO appid_token VALUES($appid,$current_token,$last_time)",vars={"appid":credential["appid"],"current_token":"", "last_time":self.last_time})
+            # print(token_acquirer.db.select('appid_token')[0])
         # Simplify this if clause?
         if time.time() - self.last_time > 7180: # If access_token is nearly invalid
             self.token = self.get_token(credential)
@@ -69,13 +69,13 @@ class token_acquirer:
                 return self.token
             # Update token and time
             # UPDATE appid_token SET current_token = , expire_time =  WHERE appid =
-            # print(self.db.select('appid_token')[0])
-            self.db.query("UPDATE appid_token SET current_token =$current_token , last_time= $last_time WHERE appid = $appid",vars={"appid":credential["appid"],"current_token":self.token, "last_time":time.time()})
-            # print(self.db.select('appid_token')[0])
+            # print(token_acquirer.db.select('appid_token')[0])
+            token_acquirer.db.query("UPDATE appid_token SET current_token =$current_token , last_time= $last_time WHERE appid = $appid",vars={"appid":credential["appid"],"current_token":self.token, "last_time":time.time()})
+            # print(token_acquirer.db.select('appid_token')[0])
             return self.token
         else:
             # find token in sql
-            return self.db.select('appid_token',id,what="current_token",where="appid = "+credential["appid"])["current_token"]
+            return token_acquirer.db.select('appid_token',id,what="current_token",where="appid = "+credential["appid"])["current_token"]
     def get_token(self,credential):
         with open(PATH+r"\..\Static\log","a") as log:
             for i in range(5): # Try 5 times
@@ -109,13 +109,24 @@ class token_acquirer:
                 log.close()
                 return "ERROR:"+msg#,0 # Read the last 5 lines and print
 class log_replyier():
+    # Adding authentication? APP secret?
+    log_dir = PATH+r"\..\Static\log"
+    #def __init__(self):
+
     def GET(self):
         try:
-            appid = dict(web.input())["appid"]
+            request_appid = dict(web.input())["appid"]
+            return log_replyier.log_finder(request_appid) # Have to use position vars?
         except Exception as err:
             return str(err)
-    def log_finder(self,appid):
-        pass
+    @staticmethod
+    def log_finder(appid):
+        with open(log_replyier.log_dir,"r") as log_file:
+            msg = "".join([i for i in log_file.readlines() if appid in i ])
+            print(msg)
+            return msg
+
+
 if __name__ == "__main__":
     app = web.application(urls,globals())
     app.run()
