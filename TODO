@@ -1,4 +1,5 @@
-Control Server:
+﻿Control Server:
 # What about multi reuse??? 多个服务器请求时怎么办
 sql expire time 问题 sql中储存上一次请求的time.time(),与当前时间相比较-》如果大于7100，重新请求access token
 *accesskey_acquirer 加入delete 操作接口-> hackable
+use web.db.query to process sql code

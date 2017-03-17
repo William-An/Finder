@@ -21,11 +21,13 @@ urls=(
 )
 
 database = sqlite3.connect(PATH+r"\..\Static\appid.db") # Initializing database
-cursor = database.cursor()
+#database_dir = PATH+r"\..\Static\appid.db"
+#database = web.database(dbn="sqlite",db=database_dir)
 # Create table to store tokens
 try:
     database.execute('''CREATE TABLE appid_token(appid text, current_token text, last_time real)''')
-except sqlite3.OperationalError:
+except:
+    del database
     pass
 
 class token_acquirer:
@@ -34,7 +36,11 @@ class token_acquirer:
         Log server's initialization
         Store debug log
         """
-        msg = time.strftime("%Y-%m-%d %H:%M:%S")+"\tServer begins..."
+        # Initialize database
+        # Class attribute?
+        self.db = web.database(dbn="sqlite",db=PATH+r"\..\Static\appid.db")
+        self.last_time = 0
+        msg = time.strftime("%Y-%m-%d %H:%M:%S")+"\tProcessing request..."
         print(msg)
         with open(PATH+r"\..\Static\log","a") as log:
             log.writelines(msg)
@@ -44,36 +50,40 @@ class token_acquirer:
     def GET(self):
         # What about multi reuse??? 多个服务器请求时怎么办 -> SQL
         credential = dict(web.input())
-        print(credential["appid"])
+        # print(credential["appid"])
         # Get elapse time to calculate expire_time -> time.time() store last record in sql, calculate with this request
         # SELECT expire_time FROM appid_token WHERE appid =
-        # SQL hacking>
         try:
-            self.last_time = cursor.execute("SELECT last_time FROM appid_token WHERE appid = ?",credential["appid"])
+            # Using db.query to process regular sql code
+            self.last_time = self.db.query("SELECT last_time FROM appid_token WHERE appid = $appid",vars= {"appid":credential["appid"]})["last_time"]
+            # print(self.last_time)
         except: # New appid?
             # INSERT INTO appid_token VALUES(appid, current_token, last_time)
-            self.last_time = 0
-            cursor.execute("INSERT INTO appid_token VALUES(?,?,?)",(credential["appid"],"",self.last_time))
-
+            self.db.query("INSERT INTO appid_token VALUES($appid,$current_token,$last_time)",vars={"appid":credential["appid"],"current_token":"", "last_time":self.last_time})
+            # print(self.db.select('appid_token')[0])
         # Simplify this if clause?
         if time.time() - self.last_time > 7180: # If access_token is nearly invalid
             self.token = self.get_token(credential)
+            print(self.token)
             if "ERROR" in self.token:
                 return self.token
             # Update token and time
-            # UPDATE Person SET current_token = , expire_time =  WHERE appid =
-            cursor.execute("UPDATE appid_token SET current_token =? ,last_time =?  WHERE appid = ?",(self.token,time.time(),credential["appid"]))
+            # UPDATE appid_token SET current_token = , expire_time =  WHERE appid =
+            # print(self.db.select('appid_token')[0])
+            self.db.query("UPDATE appid_token SET current_token =$current_token , last_time= $last_time WHERE appid = $appid",vars={"appid":credential["appid"],"current_token":self.token, "last_time":time.time()})
+            # print(self.db.select('appid_token')[0])
             return self.token
         else:
             # find token in sql
-            return cursor.execute("SELECT current_token,last_time FROM appid_token WHERE appid=?",credential["appid"])
+            return self.db.select('appid_token',id,what="current_token",where="appid = "+credential["appid"])["current_token"]
     def get_token(self,credential):
         with open(PATH+r"\..\Static\log","a") as log:
             for i in range(5): # Try 5 times
                 try:
                     key = requests.get(accesskey_url,params=credential).json()
-                except json.decoder.JSONDecodeError as err:
-                    msg = time.strftime("%Y-%m-%d %H:%M:%S")+"\t[-]Error in get:"+str(err)+"\t Usually inapporpriate GET input"
+                except Exception as err:
+                    # Change the cat of msg
+                    msg = time.strftime("%Y-%m-%d %H:%M:%S")+"\t[-] ID:"+credential["appid"]+"\tError in get:"+str(err)#+"\t Usually inapporpriate GET input"
                     # Write a function?
                     log.writelines(msg+"\n")
                     log.flush()
@@ -81,14 +91,14 @@ class token_acquirer:
                     #time.sleep(1)
                     continue
                 if "errcode" in key:
-                    msg = time.strftime("%Y-%m-%d %H:%M:%S")+"\t[-]Unable to acquire access_token:"+str(key["errcode"])+"\t"+key["errmsg"]
+                    msg = time.strftime("%Y-%m-%d %H:%M:%S")+"\t[-] ID:"+credential["appid"]+"\tUnable to acquire access_token:"+str(key["errcode"])+"\t"+key["errmsg"]
                     log.writelines(msg+"\n")
                     log.flush()
                     print(msg)
                     #time.sleep(1)
                     continue
                     # Send email?
-                msg = time.strftime("%Y-%m-%d %H:%M:%S")+"\t[+]token:"+str(key["access_token"])
+                msg = time.strftime("%Y-%m-%d %H:%M:%S")+"\t[+] ID:"+credential["appid"]+"\ttoken:"+str(key["access_token"])
                 log.writelines(msg+"\n")
                 log.flush() # Save output
                 print(msg)
