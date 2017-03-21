@@ -1,5 +1,17 @@
 ﻿Control Server:
 # What about multi reuse??? 多个服务器请求时怎么办
-sql expire time 问题 sql中储存上一次请求的time.time(),与当前时间相比较-》如果大于7100，重新请求access token
+# sql expire time 问题 sql中储存上一次请求的time.time(),与当前时间相比较-》如果大于7100，重新请求access token
 *accesskey_acquirer 加入delete 操作接口-> hackable
-use web.db.query to process sql code
+# use web.db.query to process sql code
+accesskey_acquirer.py 字符拼接改为字符串格式化
+将get accesstoken的代码封装成库
+
+Main server/finder
+post 的 xml数据解码问题
+http://webpy.org/cookbook/xmlfiles -> 返回xml数据模板的创立
+google vision
+
+2017.3.20
+开发进入停滞状态
+需要申请个体工商户认证 -》 高级接口
+不然没有个性化菜单 -》click事件无法创立

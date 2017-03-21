@@ -1,10 +1,10 @@
 import requests
+import sqlite3
+import web
 import time
 import os
 import sys
-import web
-import json
-import sqlite3
+
 # 加密？-> 出租服务器
 """
 Using two server to provide wechat subscription service,
@@ -31,6 +31,7 @@ except:
     pass
 
 class token_acquirer:
+    db=None
     def __init__(self):
         """
         Log server's initialization
@@ -49,6 +50,7 @@ class token_acquirer:
             log.close()
     def GET(self):
         # What about multi reuse??? 多个服务器请求时怎么办 -> SQL
+        # print(web.ctx.ip)
         credential = dict(web.input())
         # print(credential["appid"])
         # Get elapse time to calculate expire_time -> time.time() store last record in sql, calculate with this request
@@ -82,7 +84,7 @@ class token_acquirer:
                 try:
                     key = requests.get(accesskey_url,params=credential).json()
                 except Exception as err:
-                    # Change the cat of msg
+                    # Change to use string format: "%",var
                     msg = time.strftime("%Y-%m-%d %H:%M:%S")+"\t[-] ID:"+credential["appid"]+"\tError in get:"+str(err)#+"\t Usually inapporpriate GET input"
                     # Write a function?
                     log.writelines(msg+"\n")
