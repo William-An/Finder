@@ -31,3 +31,21 @@ event
     view
     scancode_push
     pic_photo_or_album
+
+2017.3.30
+Interface_design
+register
+    user authentication: ip?
+result
+record
+upload
+upload
+about finder
+
+merge result & record?
+separate users' page to another section?
+
+Static file? All in one dir or?
+
+TODO users info, event type: view, use wechatweb sdk to acquire users' info? Negative, not granted to call this api
+TODO return use re to generate dynamic pages? 为每一个用户动态生成一个result的page
