@@ -11,7 +11,23 @@ post 的 xml数据解码问题
 http://webpy.org/cookbook/xmlfiles -> 返回xml数据模板的创立
 google vision
 
-2017.3.20
-开发进入停滞状态
-需要申请个体工商户认证 -》 高级接口
-不然没有个性化菜单 -》click事件无法创立
+2017.3.22
+使用老爸公司的企业代号
+
+2017.3.28
+多媒体文件下载接口
+个性化菜单？？
+Msg type:
+text
+image
+voice
+video
+shortvideo
+location
+link
+event
+    <event></event>
+    click
+    view
+    scancode_push
+    pic_photo_or_album

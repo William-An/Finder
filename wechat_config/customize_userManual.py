@@ -2,6 +2,7 @@ import requests
 import os
 import sys # provide option
 import argparse # parse options
+import json
 
 PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
 token_url = "https://api.weixin.qq.com/cgi-bin/token" # Change to control server
@@ -19,12 +20,13 @@ class userInterface:
         # Initialization: acquire access_token from control server
         with open(PATH+r"\..\Static\accesskey_token.json","r") as credential_file:
             credential = eval("".join([i.strip() for i in credential_file.readlines()]))
-            # print(credential)
+            #print(credential)
             credential_file.close()
         try:
             key = requests.get(url=token_url,params=credential).json()
             token = key["access_token"]
             userInterface.credential.update([("access_token",token)])
+            #print(token)
         except Exception as err:
             if "errcode" in key:
                 print("ERROR: errcode:%\t%",(key["errcode"],key["errmsg"]))
@@ -37,10 +39,11 @@ class userInterface:
             try:
                 # print([ i.decode() for i in config_file.readlines()])
                 config = eval("".join([i.strip().decode() for i in config_file.readlines()]))
+                # print(config)
             except Exception as err:
                 print(str(err))
                 exit()
-            response = requests.post(create_interface,params=userInterface.credential,data=config).json()
+            response = requests.post(create_interface,params=userInterface.credential,data=json.dumps(config)).json() # Must use json
             print("Result\nerrcode:",response["errcode"],response["errmsg"])
     @staticmethod
     def delInterface():
@@ -76,6 +79,6 @@ if __name__ == "__main__":
         userInterface.viewAllInterface()
     elif option.inspect:
         userInterface.viewCurrentInterface()
-    else:
+    elif option.config:
         userInterface.createManual(option.config)
     exit()

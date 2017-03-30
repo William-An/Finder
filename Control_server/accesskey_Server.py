@@ -28,7 +28,6 @@ try:
     database.execute('''CREATE TABLE appid_token(appid text, current_token text, last_time real)''')
 except:
     del database
-    pass
 
 class token_acquirer:
     db=None
