@@ -49,3 +49,5 @@ Static file? All in one dir or?
 
 TODO users info, event type: view, use wechatweb sdk to acquire users' info? Negative, not granted to call this api
 TODO return use re to generate dynamic pages? 为每一个用户动态生成一个result的page
+TODO About pair algorithm: 可以先扣图再比较？
+TODO 午夜匹配？
