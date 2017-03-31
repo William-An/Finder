@@ -1,6 +1,10 @@
 #coding=utf-8
-import os
 import sys
+import os
+# Acqurie current dir
+PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
+sys.path.append(PATH+r'..\..') # Mark: Add current path for loading module
+# print(sys.path)
 import xml.etree.ElementTree as ET
 import web
 import wechat_config.get_wechatserverIP as wechatip
@@ -8,22 +12,22 @@ import Main_server.about_handler as about_handler
 import Main_server.finder_handler as finder
 
 
-# 重定向
-PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
 urls = (
-    '/wx','wechat'
+    '/wx','wechat_server',
+    '/user.','userResultHandler' # Use GET to enter user id
 )
+
 token_url = "https://api.weixin.qq.com/cgi-bin/token"
-class wechat:
+class wechat_server:
     ip_list = ['127.0.0.1']
     log_file = None
     @staticmethod
     def init():
-        with open(PATH+r'\..\Static\request_log',"a") as wechat.log_file:
-            wechat.ip_list.extend(wechatip.getip(token_url=token_url))
+        with open(PATH+r'\..\Static\request_log',"a") as wechat_server.log_file:
+            wechat_server.ip_list.extend(wechatip.getip(token_url=token_url))
 
     def POST(self):
-        if web.ctx.ip not in wechat.ip_list:
+        if web.ctx.ip not in wechat_server.ip_list:
             return "Unathorized request :)"
         xml_pkg=web.data().decode()
         # print(type(xml_pkg))
@@ -42,6 +46,7 @@ class wechat:
         # KEY word 重定向？
 
 if __name__ == "__main__":
-    wechat.init()
+    wechat_server.init()
     app = web.application(urls,globals())
     app.run()
+
