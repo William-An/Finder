@@ -39,6 +39,7 @@ class handler:
     def img_tagger(self,gs_url):
         pass
     def pair(self):
+        pass
         # How???
     def data_log(self):
-
+        pass

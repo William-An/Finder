@@ -3,8 +3,8 @@ import sys
 import os
 # Acqurie current dir
 PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
-sys.path.append(PATH+r'\..')
-
+sys.path.append(PATH+r'..\..') # Mark: Add current path for loading module
+# print(sys.path)
 import xml.etree.ElementTree as ET
 import web
 import wechat_config.get_wechatserverIP as wechatip
@@ -12,7 +12,10 @@ import Main_server.about_handler as about_handler
 import Main_server.finder_handler as finder
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> msg_receiver
 urls = (
     '/wx','wechat_server',
     '/user.','userResultHandler' # Use GET to enter user id
